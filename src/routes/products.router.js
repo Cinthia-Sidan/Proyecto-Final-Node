@@ -28,7 +28,7 @@ router.get('/api/products/:pid', (req, res) => {
 
 
 // Ruta para agregar un nuevo producto
-router.post('/api/products', (req, res) => {
+router.post('/api/productos', (req, res) => {
     
     const newProduct = req.body;
 
