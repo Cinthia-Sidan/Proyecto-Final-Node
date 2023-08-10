@@ -1,14 +1,34 @@
+
 const express = require('express');
 const router = express.Router();
 
+const fs = require('fs').promises;
+
+function cargarProductosDesdeArchivo() {
+  try {
+    const data = fs.readFileSync('productos.json', 'utf-8');
+    products = JSON.parse(data);
+  } catch (error) {
+    // El archivo no existe o no se pudo leer
+    console.log('No se pudo cargar el archivo productos.json');
+  }
+}
+
+
+function guardarProductosEnArchivo(products) {
+    fs.writeFile('productos.json', JSON.stringify(products, null, 2), 'utf-8');
+  }
 
 //Array de productos
 
-const products =[];
+const products = [];
+
+cargarProductosDesdeArchivo();
 
 //Ruta para obtener todos los productos
 router.get('/api/productos', (req, res) => {
     res.json({ products });
+    prod.readProductsFile();
 });
 
 // Ruta para obtener un producto específico
@@ -29,7 +49,7 @@ router.get('/api/products/:pid', (req, res) => {
 
 // Ruta para agregar un nuevo producto
 router.post('/api/productos', (req, res) => {
-    
+
     const newProduct = req.body;
 
     // Validamos que se proporcionen todos los campos
@@ -42,11 +62,15 @@ router.post('/api/productos', (req, res) => {
         return res.status(400).json({ error: 'Debe proporcionar todos los campos (id, name, price, description, code, stock, category).' });
     }
 
-    const timestamp= Date.now();
-    const nombre= newProduct.name;
-    newProduct.id = timestamp + nombre;
+    const timestamp = Date.now();
+    const nombre = newProduct.name;
+    newProduct.id = timestamp + nombre.replace(/\s+/g, '');
 
     products.push(newProduct);
+    guardarProductosEnArchivo(products);
+
+    console.log(products);
+
 
     res.json({ message: 'Producto agregado correctamente.' });
 
