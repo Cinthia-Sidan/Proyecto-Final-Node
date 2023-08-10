@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const contenedor = require('../managers/managerProducts');
+
 //Array de carritos
 
 const carts =[];
