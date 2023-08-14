@@ -1,3 +1,4 @@
+const { log } = require('console');
 const fs = require('fs');
 
 class Contenedor {
@@ -10,7 +11,7 @@ class Contenedor {
         try {
             const objects = await this.getAllObjects()
             const timestamp = Date.now();
-            const nombre = objeto.name;
+            const nombre = "Cartnum";
             objeto.id = timestamp + nombre.replace(/\s+/g, '');
             objects.push(objeto)
             await this.saveObjects(objects)
@@ -57,6 +58,48 @@ class Contenedor {
         }
     }
 
+
+    async updateByDobleId(objeto, cid, pid) {
+        try {
+            const carts = await this.getAllObjects();
+
+            const cartIndex = carts.find((cart) => cart.id === cid);
+
+            if (cartIndex === -1) {
+                throw new Error('No se encontro el carrito');
+            }
+
+            const productIndex = objects.find((producto) => producto.id === pid);
+
+            if (productIndex === -1) {
+                return null;
+            }
+
+            // Busco el índice del producto en el arreglo de productos del carrito
+            const cart = carts[cartIndex];
+            const cartProducts = cart.products;
+            const existingProductIndex = cartProducts.find((prod) => prod.id === pid);
+
+            // Si ya existe incremento la cantidad del producto en el carrito
+            if (existingProductIndex !== -1) {
+                cartProducts[existingProductIndex].quantity += 1;
+                console.log(cartProducts[existingProductIndex].quantity);
+                return res.json({ message: 'Cantidad del producto incrementada en el carrito.' });
+            }
+
+            //Si el producto no existe lo agrego con la cantidad 1
+            objeto.quantity = 1;
+            cartProducts.push(objeto);
+
+
+            await this.saveObjects(carts);
+            return carts[cartIndex];
+
+        }
+        catch (error) {
+            throw new Error('Error al actualizar objeto por id')
+        }
+    }
 
     async deleteById(id) {
         try {

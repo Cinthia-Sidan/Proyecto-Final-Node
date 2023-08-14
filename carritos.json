@@ -1,0 +1,37 @@
+[
+  {
+    "products": [
+      {
+        "name": "computadora Hp 5444",
+        "description": "jhvjbgcx jkhvnkb",
+        "code": 3455,
+        "stock": 55,
+        "price": 348500,
+        "category": "computacion",
+        "id": "1691705843212computadoraHp5444",
+        "quantity": 2
+      },
+      {
+        "name": "computador",
+        "description": "jhvjbgcx jkhvnkb",
+        "code": 3455,
+        "stock": 55,
+        "price": 348500,
+        "category": "computacion",
+        "id": "1691707406347computador",
+        "quantity": 2
+      },
+      {
+        "name": "computador 500",
+        "description": "jhvjbgcx jkhvnkb",
+        "code": 3455,
+        "stock": 55,
+        "price": 3055000,
+        "category": "computacion",
+        "id": "1691711322078computador",
+        "quantity": 4
+      }
+    ],
+    "id": "1692023714933Cartnum"
+  }
+]

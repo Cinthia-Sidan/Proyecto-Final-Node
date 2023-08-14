@@ -2,44 +2,29 @@
 const express = require('express');
 const router = express.Router();
 
-const fs = require('fs').promises;
+const fs = require('fs');
 
-function cargarProductosDesdeArchivo() {
-  try {
-    const data = fs.readFileSync('productos.json', 'utf-8');
-    products = JSON.parse(data);
-  } catch (error) {
-    // El archivo no existe o no se pudo leer
-    console.log('No se pudo cargar el archivo productos.json');
-  }
-}
+const Contenedor = require('../managers/managerProducts');
+
+const productos = new Contenedor("productos.json");
 
 
-function guardarProductosEnArchivo(products) {
-    fs.writeFile('productos.json', JSON.stringify(products, null, 2), 'utf-8');
-  }
-
-//Array de productos
-
-const products = [];
-
-cargarProductosDesdeArchivo();
 
 //Ruta para obtener todos los productos
-router.get('/api/productos', (req, res) => {
-    res.json({ products });
-    prod.readProductsFile();
+router.get('/api/productos', async (req, res) => {
+    const allProducts = await productos.getAllObjects();
+    res.json({ allProducts });
 });
 
 // Ruta para obtener un producto específico
-router.get('/api/products/:pid', (req, res) => {
-    const pid = parseInt(req.params.pid);
+router.get('/api/productos/:pid',async (req, res) => {
+    const pid = req.params.pid;
     console.log(pid)
 
     // Ejemplo de búsqueda en un array de productos (reemplaza esta lógica con tu base de datos)
-    const product = products.find((product) => product.id === pid);
+    const product =await productos.getById(pid);
 
-    if (!product) {
+    if (product == null) {
         return res.status(404).json({ error: 'Producto no encontrado.' });
     }
 
@@ -48,7 +33,7 @@ router.get('/api/products/:pid', (req, res) => {
 
 
 // Ruta para agregar un nuevo producto
-router.post('/api/productos', (req, res) => {
+router.post('/api/productos',async (req, res) => {
 
     const newProduct = req.body;
 
@@ -62,14 +47,10 @@ router.post('/api/productos', (req, res) => {
         return res.status(400).json({ error: 'Debe proporcionar todos los campos (id, name, price, description, code, stock, category).' });
     }
 
-    const timestamp = Date.now();
-    const nombre = newProduct.name;
-    newProduct.id = timestamp + nombre.replace(/\s+/g, '');
+    
+    
+    console.log(await productos.save(newProduct));
 
-    products.push(newProduct);
-    guardarProductosEnArchivo(products);
-
-    console.log(products);
 
 
     res.json({ message: 'Producto agregado correctamente.' });
@@ -78,43 +59,40 @@ router.post('/api/productos', (req, res) => {
 
 
 // Ruta para actualizar un producto por su ID (PUT /:pid)
-router.put('/api/products/:pid', (req, res) => {
-    const pid = parseInt(req.params.pid);
+router.put('/api/productos/:pid', async (req, res) => {
+    const pid = req.params.pid;
     const updateFields = req.body;
 
-    // Validamos que se proporcionen campos para actualizar
+    try{
+        // Validamos que se proporcionen campos para actualizar
     if (Object.keys(updateFields).length === 0) {
         return res.status(400).json({ error: 'Debe proporcionar al menos un campo para actualizar.' });
     }
 
-    const productIndex = products.find((product) => product.id === pid);
+    const update = await productos.updateById(updateFields, pid);
 
-    if (productIndex === -1) {
-        return res.status(404).json({ error: 'Producto no encontrado.' });
+    if(update == null){
+        return res.json({ error: 'Producto no existente'})
+    }
+    
+
+    return res.json(update);
+    }
+    catch(error){
+        res.status(500).json({ error: 'No se pudo actualizar el producto' });
     }
 
-    products[productIndex] = {
-        ...products[productIndex],
-        ...updateFields
-    };
-
-    return res.json(products[productIndex]);
+    
 });
 
 // Ruta para eliminar un producto por su ID (DELETE /:pid)
-router.delete('/api/products/:pid', (req, res) => {
-    const pid = parseInt(req.params.pid);
+router.delete('/api/productos/:pid',async (req, res) => {
+    const pid = req.params.pid;
 
 
-    const productIndex = products.find((product) => product.id === pid);
+    const productIndex =await productos.deleteById(pid);
 
-    if (productIndex === -1) {
-        return res.status(404).json({ error: 'Producto no encontrado.' });
-    }
-
-    const deletedProduct = products.splice(productIndex, 1);
-
-    return res.json(deletedProduct[0]);
+    res.json({ message: 'Producto eliminado correctamente.' });
 });
 
 
