@@ -37,6 +37,8 @@ router.post('/api/carts/:cid/product/:pid',async (req,res)=>{
 
     const postProductToCart=await carritos.updateByDobleId(newProduct, cid, pid);
 
+    console.log(postProductToCart);
+
     res.json({ message: 'Producto agregado al carrito correctamente.' });
 
 

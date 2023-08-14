@@ -63,28 +63,25 @@ class Contenedor {
         try {
             const carts = await this.getAllObjects();
 
-            const cartIndex = carts.find((cart) => cart.id === cid);
+            const cartIndex = carts.findIndex((cart) => cart.id === cid);
+            console.log("El index del carrito es:", cartIndex);
 
             if (cartIndex === -1) {
                 throw new Error('No se encontro el carrito');
             }
 
-            const productIndex = objects.find((producto) => producto.id === pid);
-
-            if (productIndex === -1) {
-                return null;
-            }
-
             // Busco el índice del producto en el arreglo de productos del carrito
             const cart = carts[cartIndex];
             const cartProducts = cart.products;
-            const existingProductIndex = cartProducts.find((prod) => prod.id === pid);
+            console.log("El array productos es:", cartProducts);
+            const existingProductIndex = cartProducts.findIndex((prod) => prod.id === pid);
 
             // Si ya existe incremento la cantidad del producto en el carrito
             if (existingProductIndex !== -1) {
                 cartProducts[existingProductIndex].quantity += 1;
                 console.log(cartProducts[existingProductIndex].quantity);
-                return res.json({ message: 'Cantidad del producto incrementada en el carrito.' });
+                await this.saveObjects(carts);
+                return { message: 'Cantidad del producto incrementada en el carrito.' };
             }
 
             //Si el producto no existe lo agrego con la cantidad 1
@@ -97,6 +94,7 @@ class Contenedor {
 
         }
         catch (error) {
+            console.error('Error en updateByDobleId:', error);
             throw new Error('Error al actualizar objeto por id')
         }
     }
@@ -144,36 +142,6 @@ class Contenedor {
 
 }
 
-
-
-
-/*
-const main = async () =>{
-    
-
-    //Funcion para guardar un objeto
-    const id = await productos.save(
-        {title: 'Producto', price: 1000}
-    )
-    console.log('Objeto guardado con ID:', id)
-
-    //Funcion para traer todos los productos
-    const allObjects = await productos.getAll()
-    console.log('Ubjetos guardados', allObjects)
-
-    //Eliminar un objeto
-    await productos.deleteById(1)
-    console.log("Objeto eliminado")
-
-    //Obtener objeto por ID
-    const obj = await productos.getById(1)
-    console.log("Objeto obtenido", obj)
-    
-}
-
-main().catch((error)=>console.error(error))
-const productos = new Contenedor("productos.json")
-*/
 
 
 module.exports = Contenedor;
